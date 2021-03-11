@@ -27,73 +27,49 @@ public final class StudentFakebookOracle extends FakebookOracle {
     //            identified in (B)
     //        (E) Find the IDs, first names, and last name of users born in the month
     //            identified in (C)
-    //
-    // This query is provided to you completed for reference. Below you will find the appropriate
-    // mechanisms for opening up a statement, executing a query, walking through results, extracting
-    // data, and more things that you will need to do for the remaining nine queries
     public BirthMonthInfo findMonthOfBirthInfo() throws SQLException {
         try (Statement stmt = oracle.createStatement(FakebookOracleConstants.AllScroll, FakebookOracleConstants.ReadOnly)) {
-            // Step 1
-            // ------------
-            // * Find the total number of users with birth month info
-            // * Find the month in which the most users were born
-            // * Find the month in which the fewest (but at least 1) users were born
             ResultSet rst = stmt.executeQuery(
-                "SELECT COUNT(*) AS Birthed, Month_of_Birth " +         // select birth months and number of uses with that birth month
-                "FROM " + UsersTable + " " +                            // from all users
-                "WHERE Month_of_Birth IS NOT NULL " +                   // for which a birth month is available
-                "GROUP BY Month_of_Birth " +                            // group into buckets by birth month
-                "ORDER BY Birthed DESC, Month_of_Birth ASC");           // sort by users born in that month, descending; break ties by birth month
-            
+                "SELECT COUNT(*) AS Birthed, Month_of_Birth " + 
+                "FROM " + UsersTable + " " + 
+                "WHERE Month_of_Birth IS NOT NULL " + 
+                "GROUP BY Month_of_Birth " + 
+                "ORDER BY Birthed DESC, Month_of_Birth ASC");
             int mostMonth = 0;
             int leastMonth = 0;
             int total = 0;
-            while (rst.next()) {                       // step through result rows/records one by one
-                if (rst.isFirst()) {                   // if first record
-                    mostMonth = rst.getInt(2);         //   it is the month with the most
+            while (rst.next()) { 
+                if (rst.isFirst()) { 
+                    mostMonth = rst.getInt(2); 
                 }
-                if (rst.isLast()) {                    // if last record
-                    leastMonth = rst.getInt(2);        //   it is the month with the least
+                if (rst.isLast()) { 
+                    leastMonth = rst.getInt(2); 
                 }
-                total += rst.getInt(1);                // get the first field's value as an integer
+                total += rst.getInt(1); 
             }
             BirthMonthInfo info = new BirthMonthInfo(total, mostMonth, leastMonth);
-            
-            // Step 2
-            // ------------
-            // * Get the names of users born in the most popular birth month
             rst = stmt.executeQuery(
-                "SELECT User_ID, First_Name, Last_Name " +                // select ID, first name, and last name
-                "FROM " + UsersTable + " " +                              // from all users
-                "WHERE Month_of_Birth = " + mostMonth + " " +             // born in the most popular birth month
-                "ORDER BY User_ID");                                      // sort smaller IDs first
-                
+                "SELECT User_ID, First_Name, Last_Name " + 
+                "FROM " + UsersTable + " " + 
+                "WHERE Month_of_Birth = " + mostMonth + " " + 
+                "ORDER BY User_ID"); 
             while (rst.next()) {
                 info.addMostPopularBirthMonthUser(new UserInfo(rst.getLong(1), rst.getString(2), rst.getString(3)));
             }
-
-            // Step 3
-            // ------------
-            // * Get the names of users born in the least popular birth month
             rst = stmt.executeQuery(
-                "SELECT User_ID, First_Name, Last_Name " +                // select ID, first name, and last name
-                "FROM " + UsersTable + " " +                              // from all users
-                "WHERE Month_of_Birth = " + leastMonth + " " +            // born in the least popular birth month
-                "ORDER BY User_ID");                                      // sort smaller IDs first
+                "SELECT User_ID, First_Name, Last_Name " + 
+                "FROM " + UsersTable + " " + 
+                "WHERE Month_of_Birth = " + leastMonth + " " + 
+                "ORDER BY User_ID"); 
                 
             while (rst.next()) {
                 info.addLeastPopularBirthMonthUser(new UserInfo(rst.getLong(1), rst.getString(2), rst.getString(3)));
             }
-
-            // Step 4
-            // ------------
-            // * Close resources being used
             rst.close();
-            stmt.close();                            // if you close the statement first, the result set gets closed automatically
-
+            stmt.close(); 
             return info;
-
         }
+        
         catch (SQLException e) {
             System.err.println(e.getMessage());
             return new BirthMonthInfo(-1, -1, -1);
