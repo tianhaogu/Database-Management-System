@@ -149,7 +149,7 @@ public class GetData{
             rst.close();
             stmt.close();
         }
-		return users_info;
+	return users_info;
     }
 
     // This outputs to a file "output.json"
