@@ -1,5 +1,5 @@
-uniqname = gtianhao
-password = rkZwszm41
+uniqname = 
+password = 
 
 compile:
 	javac -Xlint:-unchecked -cp "ojdbc6.jar:json-20151123.jar:json_simple-1.1.jar:" Main.java GetData.java
