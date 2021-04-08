@@ -1,6 +1,6 @@
 // fill in your database name
 // Your dbname is your uniqname
-var dbname = 'gtianhao';
+var dbname = '';
 
 var l1 = load('query1.js')
 var l2 = load('query2.js')
